@@ -1,0 +1,7 @@
+# Tinker SDK
+tinker
+
+# Core deps
+numpy
+tqdm
+torch
