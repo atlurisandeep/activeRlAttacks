@@ -38,7 +38,7 @@ if __name__ == "__main__":
                       default="Qwen/Qwen3-30B-A3B-Instruct-2507",
                       help="Attacker model (Tinker model name)")
     args.add_argument("--victim_model", type=str,
-                      default="Qwen/Qwen3-8B",
+                      default="Qwen/Qwen3-30B-A3B-Instruct-2507",
                       help="Victim model (Tinker model name)")
     args.add_argument("--judge_model", type=str,
                       default=JUDGE_MODEL,
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # Generation parameters
     args.add_argument("--max_len", type=int, default=20,
                       help="Max tokens for attacker generation")
-    args.add_argument("--victim_max_len", type=int, default=30)
+    args.add_argument("--victim_max_len", type=int, default=128)
     args.add_argument("--victim_top_p", type=float, default=0.95)
     args.add_argument("--victim_temp", type=float, default=0.7)
 
@@ -83,6 +83,21 @@ if __name__ == "__main__":
                       default="./prompts/sft_dataset.json")
     args.add_argument("--safety_data_file", type=str, default="",
                       help="JSON file with safety training data")
+
+    ######################### Category Diversity #########################
+    args.add_argument("--seed_data_file", type=str, default="",
+                      help="Annotated seed data JSON with S1-S8 categories")
+    args.add_argument("--stratify_categories", action="store_true",
+                      help="Round-robin sample across harm categories per batch")
+    args.add_argument("--condition_on_category", action="store_true",
+                      help="Inject category target into attacker prompt")
+    args.add_argument("--adaptive_category_weights", action="store_true",
+                      help="Boost rewards for underperforming categories")
+    args.add_argument("--category_weight_beta", type=float, default=2.0,
+                      help="Category boost strength: w = exp(-beta * ASR)")
+    args.add_argument("--category_ema_alpha", type=float, default=0.1,
+                      help="EMA decay for per-category ASR tracking")
+    ##################################################################
 
     # Logging / saving
     args.add_argument("--exp_name", type=str, default="active-attacks")

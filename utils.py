@@ -192,14 +192,21 @@ def seed(seed_val=42):
     os.environ["PYTHONHASHSEED"] = str(seed_val)
 
 
-def apply_chat_template(tokenizer, convo, add_generation_prompt=False):
+def strip_think_tags(text: str) -> str:
+    """Remove <think>...</think> chain-of-thought blocks from model output."""
+    return re.sub(r'<think>.*?</think>\s*', '', text, flags=re.DOTALL).strip()
+
+
+def apply_chat_template(tokenizer, convo, add_generation_prompt=False, **kwargs):
     """Tokenize a conversation using the tokenizer's chat template.
 
     Handles both HuggingFace tokenizers (which may return BatchEncoding)
     and plain tokenizers (which return a list of ints).
+    Extra kwargs (e.g. enable_thinking=False) are passed through.
     """
     result = tokenizer.apply_chat_template(
-        convo, tokenize=True, add_generation_prompt=add_generation_prompt
+        convo, tokenize=True, add_generation_prompt=add_generation_prompt,
+        **kwargs
     )
     # HF tokenizers may return a BatchEncoding (dict-like with 'input_ids')
     if hasattr(result, 'keys') or isinstance(result, dict):
